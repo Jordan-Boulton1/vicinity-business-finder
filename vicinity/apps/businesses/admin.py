@@ -1,8 +1,11 @@
 from django.contrib import admin
-from .models import Business
+from .models import Business, BusinessImage
 
 # Register your models here.
 
+class BusinessImageInline(admin.TabularInline):
+    model = BusinessImage
+    extra = 1
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
@@ -32,3 +35,5 @@ class BusinessAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+    inlines = [BusinessImageInline]

@@ -77,3 +77,34 @@ class Business(models.Model):
 
     def __str__(self):
         return self.name
+
+class BusinessImage(models.Model):
+    """
+    Model for storing multiple images for a business.
+    """
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+    image = models.ImageField(upload_to="business_images/")
+    caption = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)
+    craeted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Business Image'
+        verbose_name_plural = 'Business Images'
+        ordering = ['-is_primary', 'created_at']
+
+    def __str__(self):
+        return f'Image for {self.business.name}'
+    
+    def save(self, *args, **kwargs):
+        # ensure only one primary image per business
+        if self.is_primary:
+            self.__class__.objects.filter(
+                business=self.business,
+                is_primary=True
+            ).update(is_primary=False)
+        super().save(*args, **kwargs)
